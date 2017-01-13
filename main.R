@@ -12,8 +12,8 @@ library(raster)
 library(rgdal)
 
 
-download.file("https://www.dropbox.com/s/akb9oyye3ee92h3/LT51980241990098-SC20150107121947.tar.gz?dl=0", "data/landsat5.tar.gz")
-download.file("https://www.dropbox.com/s/i1ylsft80ox6a32/LC81970242014109-SC20141230042441.tar.gz?dl=0", "data/landsat8.tar.gz")
+download.file("https://www.dropbox.com/s/akb9oyye3ee92h3/LT51980241990098-SC20150107121947.tar.gz?dl=1", "data/landsat5.tar.gz", method= "auto",mode="wb")
+download.file("https://www.dropbox.com/s/i1ylsft80ox6a32/LC81970242014109-SC20141230042441.tar.gz?dl=1", "data/landsat8.tar.gz", method= "auto",mode="wb")
 
 # unziping files
 untar('data/landsat5.tar.gz', exdir = "data/")
@@ -41,8 +41,8 @@ lands5_NoCloud <- dropLayer(lands5_ext, 1)
 lands8_NoCloud <- dropLayer(lands8_ext, 1)
 
 ## Replace 'clear land' with 'NA'
-fmask5[clmask5 == 0] <- NA
-fmask8[clmask8 == 0] <- NA
+#fmask5[clmask5 == 0] <- NA
+#fmask8[clmask8 == 0] <- NA
 
 source("R/cloud2NA.R") # Source de function saved in R folder of the project
 
@@ -58,17 +58,20 @@ names (lands8_CloudFree) = names (lands8_NoCloud) # To recover the original name
 # NDVI calculations
 source("R/ndviCalc.R")
 
-ndvilands5 <- overlay(x= lands5_CloudFree[[6]], y=lands5_CloudFree[[5]], fun=ndviCalc)
-plot(ndvilands5)
-ndvilands8 <- overlay(x=lands8_CloudFree[[7]], y=lands8_CloudFree[[6]], fun=ndviCalc)
-plot(ndvilands8)
+ndvilands5 <- overlay(x= lands5_CloudFree[[5]], y=lands5_CloudFree[[6]], fun=ndviCalc)
+plot(ndvilands5, main="NDVI for Landsat TM 5, 1990")
+ndvilands8 <- overlay(x=lands8_CloudFree[[4]], y=lands8_CloudFree[[5]], fun=ndviCalc)
+plot(ndvilands8, main="NDVI for Landsat 8 OLI, 2014")
 
 # NDVI change over 30 years
 NDVI_dif <- ndvilands8 - ndvilands5
-plot(NDVI_dif)
+plot(NDVI_dif, main="Difference between 2014's NDVI and 1990's NDVI")
 # Convert the image to a KML format. To use it on Google Earth
 NDVI_dif_to_KML <- projectRaster(NDVI_dif, crs='+proj=longlat')
-KML(x=NDVI_dif_to_KML, filename='NDVI_dif.kml')
+KML(x=NDVI_dif_to_KML, filename='NDVI_dif.kml',overwrite=TRUE)
+
+#create a raster from the NDVI Difference
+writeRaster(x=NDVI_dif, filename="NDVI_differences.tif", datatype='FLT4S',overwrite= TRUE)
 
 
 
