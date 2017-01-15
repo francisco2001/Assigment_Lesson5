@@ -6,6 +6,7 @@
 
 rm(list= ls())
 getwd()
+dir.create("data", showWarnings = TRUE)
 
 # Importing lybraries 
 library(sp)
@@ -69,7 +70,7 @@ plot(ndvilands5, main="NDVI for Landsat TM 5, 1990")
 ndvilands8 <- overlay(x=lands8_CloudFree[[4]], y=lands8_CloudFree[[5]], fun=ndviCalc)
 plot(ndvilands8, main="NDVI for Landsat 8 OLI, 2014")
 
-# NDVI change over 30 years
+# NDVI change over to periods 
 NDVI_dif <- ndvilands8 - ndvilands5
 plot(NDVI_dif, main="Difference between 2014's NDVI and 1990's NDVI")
 # Convert the image to a KML format. To use it on Google Earth
