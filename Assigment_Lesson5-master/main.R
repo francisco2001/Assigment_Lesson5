@@ -5,6 +5,7 @@
 #Cleaning the workspace
 
 rm(list= ls())
+getwd()
 
 # Importing lybraries 
 library(sp)
@@ -16,9 +17,14 @@ library(rgdal)
 source("R/cloud2NA.R") # Source de function saved in R folder of the project
 source("R/ndviCalc.R")
 
+#Download link for Linux (Windows would be different, see below) 
+download.file("https://www.dropbox.com/s/akb9oyye3ee92h3/LT51980241990098-SC20150107121947.tar.gz?dl=1", "data/landsat5.tar.gz")
+download.file("https://www.dropbox.com/s/i1ylsft80ox6a32/LC81970242014109-SC20141230042441.tar.gz?dl=1", "data/landsat8.tar.gz")
+  
+  #for Windows
+  #download.file("https://www.dropbox.com/s/akb9oyye3ee92h3/LT51980241990098-SC20150107121947.tar.gz?dl=1", "data/landsat5.tar.gz", method= "auto",mode="wb")
+  #download.file("https://www.dropbox.com/s/i1ylsft80ox6a32/LC81970242014109-SC20141230042441.tar.gz?dl=1", "data/landsat8.tar.gz", method= "auto",mode="wb")
 
-download.file("https://www.dropbox.com/s/akb9oyye3ee92h3/LT51980241990098-SC20150107121947.tar.gz?dl=1", "data/landsat5.tar.gz", method= "auto",mode="wb")
-download.file("https://www.dropbox.com/s/i1ylsft80ox6a32/LC81970242014109-SC20141230042441.tar.gz?dl=1", "data/landsat8.tar.gz", method= "auto",mode="wb")
 
 # unziping files
 untar('data/landsat5.tar.gz', exdir = "data/")
@@ -51,12 +57,12 @@ lands8_NoCloudmask <- dropLayer(lands8_ext, 1)
 lands5_CloudFree <- overlay(x = lands5_NoCloudmask, y = fmask5, fun = cloud2NA)
 lands8_CloudFree <- overlay(x = lands8_NoCloudmask, y = fmask8, fun = cloud2NA)
 
-names (lands5_CloudFree) = names (lands5_NoCloud) # To recover the original names 
-names (lands8_CloudFree) = names (lands8_NoCloud) # To recover the original names
+names (lands5_CloudFree) = names (lands5_NoCloudmask) # To recover the original names 
+names (lands8_CloudFree) = names (lands8_NoCloudmask) # To recover the original names
 
 
 # NDVI calculations
-
+# Landsat bands guidelines for R and NIR, respectively- L5 (3, 4); L8 (4, 5). Check subset index using ´names´.
 
 ndvilands5 <- overlay(x= lands5_CloudFree[[5]], y=lands5_CloudFree[[6]], fun=ndviCalc)
 plot(ndvilands5, main="NDVI for Landsat TM 5, 1990")
